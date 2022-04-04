@@ -19,13 +19,13 @@ type Record struct {
 	RUA       string // empty value: "-""
 	Policy    DMARCPolicy
 	PCT       int                     // from DNS value 0 to 100 (not in dns=100)
-	ADKIM     int                     // opendmarc README: (114 = relaxed, 115 = strict)
-	ASPF      int                     // opendmarc README: (114 = relaxed, 115 = strict)
+	ADKIM     ALIGNMENTRULE           // published policy's alignment rule for DKIM and SPF (114 = relaxed, 115 = strict)
+	ASPF      ALIGNMENTRULE           // published policy's alignment rule for DKIM and SPF (114 = relaxed, 115 = strict)
 	P         DMARC_DNS_RECORD_Policy // Policy from DNS Record (required in dns)
 	SP        DMARC_DNS_RECORD_Policy // SubDomainPolicy from DNS Record (optional in dns)
-	AlignDKIM int                     // whether identifier alignment was established (4 = yes, 5 = no)
-	AlignSPF  int                     // whether identifier alignment was established (4 = yes, 5 = no)
-	ARC       int                     // ARC evaluation (0 = pass, 7 = fail) = https://github.com/trusteddomainproject/OpenDMARC/issues/214
+	AlignDKIM bool                    // whether identifier alignment was established (4 = yes, 5 = no)
+	AlignSPF  bool                    // whether identifier alignment was established (4 = yes, 5 = no)
+	ARC       bool                    // ARC evaluation (0 = pass, 7 = fail) = https://github.com/trusteddomainproject/OpenDMARC/issues/214
 	SPF       SPF                     // (0 = pass, 2 = fail, 6 = none, -1 = not evaluated)
 	Action    DMARCResult
 }
@@ -51,10 +51,30 @@ func (r Record) String() string {
 	fmt.Fprintf(&s, "aspf %d\n", r.ASPF)
 	fmt.Fprintf(&s, "p %d\n", r.P)
 	fmt.Fprintf(&s, "sp %d\n", r.SP)
-	fmt.Fprintf(&s, "align_dkim %d\n", r.AlignDKIM)
-	fmt.Fprintf(&s, "align_spf %d\n", r.AlignSPF)
-	fmt.Fprintf(&s, "arc %d\n", r.ARC)
-	fmt.Fprintf(&s, "arc_policy %s\n", r.ARCPolicy)
+	aligndkim := 5 // no
+	alignspf := 5  // no
+	if r.AlignDKIM {
+		aligndkim = 4
+	}
+	if r.AlignSPF {
+		alignspf = 4
+	}
+	fmt.Fprintf(&s, "align_dkim %d\n", aligndkim)
+	fmt.Fprintf(&s, "align_spf %d\n", alignspf)
+	arc := 7
+	if r.ARC {
+		arc = 0
+	}
+	fmt.Fprintf(&s, "arc %d\n", arc)
+	arcpolicy := r.ARCPolicy
+	if arcpolicy == "" {
+		if r.ARC {
+			arcpolicy = "0 json:[]"
+		} else {
+			arcpolicy = "2 json:[]"
+		}
+	}
+	fmt.Fprintf(&s, "arc_policy %s\n", arcpolicy)
 	fmt.Fprintf(&s, "action %d\n", r.Action)
 	return s.String()
 }

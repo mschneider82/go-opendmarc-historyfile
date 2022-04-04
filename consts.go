@@ -8,6 +8,13 @@ const (
 	DMARC_ARC_POLICY_RESULT_FAIL   ARCPolicyValue = 2 // should be the default
 )
 
+type ALIGNMENTRULE int
+
+const (
+	Relaxed ALIGNMENTRULE = 114
+	Strict  ALIGNMENTRULE = 115
+)
+
 type DMARCResult int
 
 const (
