@@ -5,6 +5,8 @@ import (
 	"io"
 	"strings"
 	"time"
+
+	"github.com/emersion/go-msgauth/dmarc"
 )
 
 type Record struct {
@@ -19,8 +21,8 @@ type Record struct {
 	RUA       string // empty value: "-""
 	Policy    DMARCPolicy
 	PCT       int                     // from DNS value 0 to 100 (not in dns=100)
-	ADKIM     ALIGNMENTRULE           // published policy's alignment rule for DKIM and SPF (114 = relaxed, 115 = strict)
-	ASPF      ALIGNMENTRULE           // published policy's alignment rule for DKIM and SPF (114 = relaxed, 115 = strict)
+	ADKIM     dmarc.AlignmentMode     // published policy's alignment rule for DKIM and SPF (114 = relaxed, 115 = strict)
+	ASPF      dmarc.AlignmentMode     // published policy's alignment rule for DKIM and SPF (114 = relaxed, 115 = strict)
 	P         DMARC_DNS_RECORD_Policy // Policy from DNS Record (required in dns)
 	SP        DMARC_DNS_RECORD_Policy // SubDomainPolicy from DNS Record (optional in dns)
 	AlignDKIM bool                    // whether identifier alignment was established (4 = yes, 5 = no)
@@ -47,8 +49,16 @@ func (r Record) String() string {
 		fmt.Fprintf(&s, "rua %s\n", r.RUA)
 	}
 	fmt.Fprintf(&s, "pct %d\n", r.PCT)
-	fmt.Fprintf(&s, "adkim %d\n", r.ADKIM)
-	fmt.Fprintf(&s, "aspf %d\n", r.ASPF)
+	adkim := 114 // relaxed
+	if r.ADKIM == dmarc.AlignmentStrict {
+		adkim = 115 // strict
+	}
+	fmt.Fprintf(&s, "adkim %d\n", adkim)
+	aspf := 114 // relaxed
+	if r.ASPF == dmarc.AlignmentStrict {
+		aspf = 115 // strict
+	}
+	fmt.Fprintf(&s, "aspf %d\n", aspf)
 	fmt.Fprintf(&s, "p %d\n", r.P)
 	fmt.Fprintf(&s, "sp %d\n", r.SP)
 	aligndkim := 5 // no
