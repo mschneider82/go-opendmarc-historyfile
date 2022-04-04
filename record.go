@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/emersion/go-msgauth/authres"
 	"github.com/emersion/go-msgauth/dmarc"
 )
 
@@ -28,7 +29,7 @@ type Record struct {
 	AlignDKIM bool                // whether identifier alignment was established (4 = yes, 5 = no)
 	AlignSPF  bool                // whether identifier alignment was established (4 = yes, 5 = no)
 	ARC       bool                // ARC evaluation (0 = pass, 7 = fail) = https://github.com/trusteddomainproject/OpenDMARC/issues/214
-	SPF       SPF                 // (0 = pass, 2 = fail, 6 = none, -1 = not evaluated)
+	SPF       authres.ResultValue // SPF (0 = pass, 2 = fail, 6 = none, -1 = not evaluated)
 	Action    DMARCResult
 }
 
@@ -40,7 +41,22 @@ func (r Record) String() string {
 	s.WriteString("ipaddr " + r.IPAddr + "\n")
 	s.WriteString("from " + strings.ToLower(r.From) + "\n")
 	s.WriteString("mfrom " + strings.ToLower(r.EnvFrom) + "\n")
-	fmt.Fprintf(&s, "spf %d\n", r.SPF)
+	var _spf spf
+	switch r.SPF {
+	case authres.ResultNone:
+		_spf = spf_result_none
+	case authres.ResultPass:
+		_spf = spf_result_pass
+	case authres.ResultTempError:
+		_spf = spf_result_tempfail
+	case authres.ResultPermError:
+		_spf = spf_result_permerror
+	case authres.ResultFail:
+		_spf = spf_result_fail
+	default:
+		_spf = spf_result_undefinied
+	}
+	fmt.Fprintf(&s, "spf %d\n", _spf)
 	s.WriteString("pdomain " + r.PDomain + "\n")
 	fmt.Fprintf(&s, "policy %d\n", r.Policy)
 	if r.RUA == "" {

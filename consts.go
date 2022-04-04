@@ -1,5 +1,7 @@
 package goopendmarchistoryfile
 
+import "github.com/emersion/go-msgauth/authres"
+
 type ARCPolicyValue int
 
 const (
@@ -18,24 +20,24 @@ const (
 	DMARC_RESULT_QUARANTINE DMARCResult = 4
 )
 
-// ARESResult type for specifying an authentication result
-type ARESResult int
+// aresresult type for specifying an authentication result
+type aresresult int
 
 const (
-	ARES_RESULT_UNDEFINED ARESResult = -1
-	ARES_RESULT_PASS      ARESResult = 0
-	ARES_RESULT_UNUSED    ARESResult = 1
-	ARES_RESULT_SOFTFAIL  ARESResult = 2
-	ARES_RESULT_NEUTRAL   ARESResult = 3
-	ARES_RESULT_TEMPERROR ARESResult = 4
-	ARES_RESULT_PERMERROR ARESResult = 5
-	ARES_RESULT_NONE      ARESResult = 6
-	ARES_RESULT_FAIL      ARESResult = 7
-	ARES_RESULT_POLICY    ARESResult = 8
-	ARES_RESULT_NXDOMAIN  ARESResult = 9
-	ARES_RESULT_SIGNED    ARESResult = 10
-	ARES_RESULT_UNKNOWN   ARESResult = 11
-	ARES_RESULT_DISCARD   ARESResult = 12
+	ares_result_undefined aresresult = -1
+	ares_result_pass      aresresult = 0
+	ares_result_unused    aresresult = 1
+	ares_result_softfail  aresresult = 2
+	ares_result_neutral   aresresult = 3
+	ares_result_temperror aresresult = 4
+	ares_result_permerror aresresult = 5
+	ares_result_none      aresresult = 6
+	ares_result_fail      aresresult = 7
+	ares_result_policy    aresresult = 8
+	ares_result_nxdomain  aresresult = 9
+	ares_result_signed    aresresult = 10
+	ares_result_unknown   aresresult = 11
+	ares_result_discard   aresresult = 12
 )
 
 /*
@@ -57,16 +59,18 @@ const (
 
 )
 
-type SPF = ARESResult
+type spf = aresresult
 
 const (
-	SPF_RESULT_UNDEFINIED SPF = ARES_RESULT_UNDEFINED
-	SPF_RESULT_PASS       SPF = ARES_RESULT_PASS
-	SPF_RESULT_NONE       SPF = ARES_RESULT_NONE
-	SPF_RESULT_TEMPFAIL   SPF = ARES_RESULT_TEMPERROR
-	SPF_RESULT_FAIL       SPF = ARES_RESULT_FAIL
-	SPF_RESULT_PERMERROR  SPF = ARES_RESULT_PERMERROR
+	spf_result_undefinied spf = ares_result_undefined
+	spf_result_pass       spf = ares_result_pass
+	spf_result_none       spf = ares_result_none
+	spf_result_tempfail   spf = ares_result_temperror
+	spf_result_fail       spf = ares_result_fail
+	spf_result_permerror  spf = ares_result_permerror
 )
+
+const SPF_RESULT_UNDEFINIED authres.ResultValue = "undefined"
 
 type dmarc_dns_record_Policy int
 
