@@ -20,15 +20,15 @@ type Record struct {
 	ARCPolicy string // arc_policy %d(=ARCPolicyValue) json:[instance{"i":%d,"d":"%s","s":"%s","ip":"%s"},... instance{}...]
 	RUA       string // empty value: "-""
 	Policy    DMARCPolicy
-	PCT       int                     // from DNS value 0 to 100 (not in dns=100)
-	ADKIM     dmarc.AlignmentMode     // published policy's alignment rule for DKIM and SPF (114 = relaxed, 115 = strict)
-	ASPF      dmarc.AlignmentMode     // published policy's alignment rule for DKIM and SPF (114 = relaxed, 115 = strict)
-	P         DMARC_DNS_RECORD_Policy // Policy from DNS Record (required in dns)
-	SP        DMARC_DNS_RECORD_Policy // SubDomainPolicy from DNS Record (optional in dns)
-	AlignDKIM bool                    // whether identifier alignment was established (4 = yes, 5 = no)
-	AlignSPF  bool                    // whether identifier alignment was established (4 = yes, 5 = no)
-	ARC       bool                    // ARC evaluation (0 = pass, 7 = fail) = https://github.com/trusteddomainproject/OpenDMARC/issues/214
-	SPF       SPF                     // (0 = pass, 2 = fail, 6 = none, -1 = not evaluated)
+	PCT       int                 // from DNS value 0 to 100 (not in dns=100)
+	ADKIM     dmarc.AlignmentMode // published policy's alignment rule for DKIM and SPF (114 = relaxed, 115 = strict)
+	ASPF      dmarc.AlignmentMode // published policy's alignment rule for DKIM and SPF (114 = relaxed, 115 = strict)
+	P         dmarc.Policy        // Policy from DNS Record (required in dns)
+	SP        dmarc.Policy        // SubDomainPolicy from DNS Record (optional in dns)
+	AlignDKIM bool                // whether identifier alignment was established (4 = yes, 5 = no)
+	AlignSPF  bool                // whether identifier alignment was established (4 = yes, 5 = no)
+	ARC       bool                // ARC evaluation (0 = pass, 7 = fail) = https://github.com/trusteddomainproject/OpenDMARC/issues/214
+	SPF       SPF                 // (0 = pass, 2 = fail, 6 = none, -1 = not evaluated)
 	Action    DMARCResult
 }
 
@@ -59,8 +59,27 @@ func (r Record) String() string {
 		aspf = 115 // strict
 	}
 	fmt.Fprintf(&s, "aspf %d\n", aspf)
-	fmt.Fprintf(&s, "p %d\n", r.P)
-	fmt.Fprintf(&s, "sp %d\n", r.SP)
+	p := dmarc_record_p_unspecified
+	switch r.P {
+	case dmarc.PolicyNone:
+		p = dmarc_record_p_none
+	case dmarc.PolicyQuarantine:
+		p = dmarc_record_p_quarantine
+	case dmarc.PolicyReject:
+		p = dmarc_record_p_reject
+	}
+	fmt.Fprintf(&s, "p %d\n", p)
+
+	sp := dmarc_record_p_unspecified
+	switch r.P {
+	case dmarc.PolicyNone:
+		sp = dmarc_record_p_none
+	case dmarc.PolicyQuarantine:
+		sp = dmarc_record_p_quarantine
+	case dmarc.PolicyReject:
+		sp = dmarc_record_p_reject
+	}
+	fmt.Fprintf(&s, "sp %d\n", sp)
 	aligndkim := 5 // no
 	alignspf := 5  // no
 	if r.AlignDKIM {

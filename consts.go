@@ -8,13 +8,6 @@ const (
 	DMARC_ARC_POLICY_RESULT_FAIL   ARCPolicyValue = 2 // should be the default
 )
 
-type ALIGNMENTRULE int
-
-const (
-	Relaxed ALIGNMENTRULE = 114
-	Strict  ALIGNMENTRULE = 115
-)
-
 type DMARCResult int
 
 const (
@@ -75,11 +68,11 @@ const (
 	SPF_RESULT_PERMERROR  SPF = ARES_RESULT_PERMERROR
 )
 
-type DMARC_DNS_RECORD_Policy int
+type dmarc_dns_record_Policy int
 
 const (
-	DMARC_RECORD_P_UNSPECIFIED DMARC_DNS_RECORD_Policy = '\x00' // p and sp
-	DMARC_RECORD_P_NONE        DMARC_DNS_RECORD_Policy = 'n'    // p and sp
-	DMARC_RECORD_P_QUARANTINE  DMARC_DNS_RECORD_Policy = 'q'    // p and sp
-	DMARC_RECORD_P_REJECT      DMARC_DNS_RECORD_Policy = 'r'    // p and sp
+	dmarc_record_p_unspecified dmarc_dns_record_Policy = '\x00' // p and sp
+	dmarc_record_p_none        dmarc_dns_record_Policy = 'n'    // p and sp
+	dmarc_record_p_quarantine  dmarc_dns_record_Policy = 'q'    // p and sp
+	dmarc_record_p_reject      dmarc_dns_record_Policy = 'r'    // p and sp
 )
